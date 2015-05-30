@@ -8,7 +8,7 @@ def fetch_commit_hash_list()
 end
 
 def get_version(hash)
-  if hash.upcase == 'HEAD'
+  if hash.nil? or hash.upcase == 'HEAD'
      hash = `git rev-parse HEAD`.strip
   end
   
@@ -24,6 +24,12 @@ def get_version(hash)
 end
 
 def get_hash(version)
+  if version.nil?
+     hash = `git rev-parse HEAD`.strip
+     puts "#{hash}"
+     exit 0
+  end
+  
   hash_list = fetch_commit_hash_list()
   version_number = version.to_i
   
@@ -46,14 +52,9 @@ if ACTION.nil?
   exit 1
 end
 
-if VERSION_OR_HASH.nil?
-  puts 'Error: No verson/hash given'
-  exit 1
-end
-
 case ACTION
-  when 'get-version' then get_version(VERSION_OR_HASH)
-  when 'get-hash' then get_hash(VERSION_OR_HASH)
+  when 'get-version' then get_version(ARGV.shift)
+  when 'get-hash' then get_hash(ARGV.shift)
   
   else
     puts "Error: Unknown action #{ACTION}"
